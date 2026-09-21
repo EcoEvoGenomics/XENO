@@ -9,7 +9,7 @@ call_variants: true
 deduplicate: false
 downsample: false
 read_target: 1000000
-trimming_flags: ./examples/default.trim
+trimming_flags: 
 aligner: gpu
 exclude_flags: 0x400
 
@@ -19,4 +19,4 @@ concatenate_raw_vcf: false
 # Reference genome
 ref_genome: 
 ref_scaffold_name: 
-ref_ploidy_file: ./examples/default.ploidy
+ref_ploidy_file: 
