@@ -92,6 +92,9 @@ XENO has user-configurable options. These options are read from `options.yaml`, 
 | `samples` | Path to sample CSV file. | `/user/path/samples.csv` | |
 | `trim_align` | Run trimming and alignment stage? | `true` | `true` |
 | `call_variants` | Run variant calling stage? | `true` | `true` |
+| `ref_genome` | Path to [reference genome](#required-reference-files). | `/user/path/ref/reference_genome.fa` | |
+| `ref_scaffold_name` | [Prefix](#required-reference-files) characteristic of scaffolds in reference genome. | `NW_` | |
+| `ref_ploidy_file` | Path to [ploidy file](#required-reference-files). | `/user/path/ref/reference.ploidy` | |
 | `deduplicate` | Deduplicate reads before trimming? | `false` | `false` |
 | `downsample` | Downsample R1 and R2 files to `read_target` before trimming? | `false` | `false` |
 | `read_target` | Number of reads to downsample to in each of R1 and R2 files.  | `250000` | `1000000` |
@@ -99,9 +102,6 @@ XENO has user-configurable options. These options are read from `options.yaml`, 
 | `aligner` | Align with `gpu` ([fq2bam](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/fq2bam)), `mem` (bwa mem), or `aln` (bwa aln)? While `gpu` is most efficient, you need [compatible GPUs](https://docs.nvidia.com/clara/parabricks/get-started/installation-requirements#hardware-requirements) to use it.  | `mem` | `gpu` |
 | `exclude_flags` | Exclude reads with this/these flag(s) from alignments. See options [here](https://www.htslib.org/doc/samtools-flags.html). | `DUP,UNMAP` | `0x400` |
 | `concatenate_raw_vcf` | If `false`, only output variants in per-chromosome files. If `true`, also create whole-genome VCF of raw variants. | `true` | `false` |
-| `ref_genome` | Path to [reference genome](#required-reference-files). | `/user/path/ref/reference_genome.fa` | |
-| `ref_scaffold_name` | [Prefix](#required-reference-files) characteristic of scaffolds in reference genome. | `NW_` | |
-| `ref_ploidy_file` | Path to [ploidy file](#required-reference-files). | `/user/path/ref/reference.ploidy` | |
 
 #### Launching XENO through the job scheduler
 Experienced UNIX / HPC users will require no assistance launching XENO: simply load the required dependencies and call `bash ./XENO` in the way you see fit. This section and the next will cover two such ways for less experienced bioinformaticians.

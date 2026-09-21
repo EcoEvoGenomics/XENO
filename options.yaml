@@ -1,9 +1,14 @@
 # Absolute path to input CSV
-samples: 
+samples:
 
-# Which steps to run?
+# Steps
 trim_align: true
 call_variants: true
+
+# Reference genome
+ref_genome: 
+ref_ploidy_file: 
+ref_scaffold_name: 
 
 # Options for read pre-processing and alignment
 deduplicate: false
@@ -15,8 +20,3 @@ exclude_flags: 0x400
 
 # Options for variant calling
 concatenate_raw_vcf: false
-
-# Reference genome
-ref_genome: 
-ref_scaffold_name: 
-ref_ploidy_file: 

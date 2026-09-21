@@ -2,24 +2,24 @@ workflow {
 
     samples = params.samples ?: null
     trim_align = params.trim_align ?: false
+    ref_genome = params.ref_genome ?: null
+    ref_scaffold_name = params.ref_scaffold_name ?: null
+    ref_ploidy_file = params.ref_ploidy_file ?: null
     downsample = params.downsample ?: false
     read_target = params.read_target ?: null
     trimming_flags = params.trimming_flags ?: null
     aligner = params.aligner ?: null
     exclude_flags = params.exclude_flags ?: null
-    ref_genome = params.ref_genome ?: null
-    ref_scaffold_name = params.ref_scaffold_name ?: null
-    ref_ploidy_file = params.ref_ploidy_file ?: null
 
     if (
         samples == null ||
+        ref_genome == null ||
+        ref_scaffold_name == null ||
+        ref_ploidy_file == null ||
         (trim_align && downsample && read_target == null) ||
         (trim_align && trimming_flags == null) ||
         (trim_align && aligner != "gpu" && aligner != "mem" && aligner != "aln") ||
-        (trim_align && exclude_flags == null) ||
-        ref_genome == null ||
-        ref_scaffold_name == null ||
-        ref_ploidy_file == null
+        (trim_align && exclude_flags == null)
         ) {
             exit(1, "Required options are unset or incorrectly set in options.yaml.")
     }
