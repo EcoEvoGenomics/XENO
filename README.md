@@ -64,7 +64,7 @@ The end positions here are arbitrary. They must be at least as large as the leng
 For each sample you wish to genotype, XENO requires five inputs. You must provide the inputs in a comma-separated file (`.csv`) with one row per pair of forward and reverse read files and five columns:
 
 1. Sample ID. A single text string of *only* alphanumeric characters, e.g. "SAMPLE1" but not "SAMPLE_1" or "SAMPLE.1".
-2. Sample sex. The sex codes (e.g. F, M) are arbitrary but must correspond to the reference ploidy file (see [above](#required-reference-files)).
+2. Sample sex. The sex codes (e.g. F, M) are arbitrary and you can specify any number of them, but they must all correspond to the reference ploidy file (see [above](#required-reference-files)).
 3. Lane code to distinguish reads from the same sample from different sequencing lanes. Use the format "LXXX" where "XXX" is a number with leading zeroes (e.g. L001). If you have only one set of files per sample, use only "L001". If you have more sets of file per sample, separate them on different rows with increasing lane codes. In *principle* the format (LXXX) is arbitrary, but the QC report will only be organised correctly when this format is adhered to.
 4. Absolute path to the forward read file (R1).
 5. Absolute path to the reverse read file (R2).
