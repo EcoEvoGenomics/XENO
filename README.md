@@ -116,10 +116,25 @@ XENO has user-configurable options. These options are read from `options.yaml`, 
 | `deduplicate` | Deduplicate reads before trimming? | `false` | `false` |
 | `downsample` | Downsample R1 and R2 files to `read_target` before trimming? | `false` | `false` |
 | `read_target` | Number of reads to downsample to in each of R1 and R2 files.  | `250000` | `1000000` |
-| `trimming_flags` | Path to a file with [fastp read trimming flags](https://github.com/OpenGene/fastp#filtering). | `/user/path/trim.txt`| |
+| `trimming_flags` | Path to a file with fastp read trimming flags. | `/user/path/trim.txt`| |
 | `aligner` | Align with `gpu` ([fq2bam](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/fq2bam)), `mem` (bwa mem), or `aln` (bwa aln)? While `gpu` is most efficient, you need [compatible GPUs](https://docs.nvidia.com/clara/parabricks/get-started/installation-requirements#hardware-requirements) to use it.  | `mem` | `gpu` |
 | `exclude_flags` | Exclude reads with this/these flag(s) from alignments. See options [here](https://www.htslib.org/doc/samtools-flags.html). | `DUP,UNMAP` | `0x400` |
 | `concatenate_raw_vcf` | If `false`, only output variants in per-chromosome files. If `true`, also create whole-genome VCF of raw variants. | `true` | `false` |
+
+The file path passed to `trimming_flags` is to a plain .txt file with one fastp flag per line. The flags are passed verbatim to fastp. The settings below are a sensible starting point, and you may adjust them or add other [fastp flags](https://github.com/OpenGene/fastp#filtering):
+
+```
+--qualified_quality_phred 20
+--unqualified_percent_limit 40
+--average_qual 20
+--length_required 50
+--length_limit 0
+--complexity_threshold 30
+--cut_window_size 1
+--cut_mean_quality 20
+--cut_front
+--cut_tail
+```
 
 #### Launching XENO through the job scheduler
 Experienced UNIX / HPC users will require no assistance launching XENO: simply load the required dependencies and call `bash ./XENO` in the way you see fit. This section and the next will cover two such ways for less experienced bioinformaticians.
