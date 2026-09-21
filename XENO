@@ -24,7 +24,7 @@ cd $repository_path
 
 output_dir=${repository_path}/output
 trim_align_output_dir=${output_dir}/alignments
-call_variants_output_dir=${output_dir}/genotypes
+call_variants_output_dir=${output_dir}/variants
 mkmissingdir $output_dir
 
 nextflow -log ./.nextflow/nextflow.log \
