@@ -64,7 +64,9 @@ if [ "$doCallVariants" = true ]; then
         --publish_dir $variantsDir
 fi
 
-nextflow -log ./.nextflow/nextflow.log \
-    run ./source/nextflow/run_multiqc.nf \
-    --results_dir $publishDir \
-    --publish_dir $publishDir
+if [ "$doTrimAlign" = true ] || [ "$doCallVariants" = true ]; then
+    nextflow -log ./.nextflow/nextflow.log \
+        run ./source/nextflow/run_multiqc.nf \
+        --results_dir $publishDir \
+        --publish_dir $publishDir
+fi
