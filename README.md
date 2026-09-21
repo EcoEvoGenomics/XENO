@@ -12,10 +12,7 @@ The Wiki describes XENO in greater detail. There you will also find guides for s
 XENO is intended to run on a high-performance computing (HPC) system and is built with [Nextflow](https://www.nextflow.io/) version 25.04.6. This *specific* version of Nextflow must be installed to use XENO. Out of the box, XENO also depends on the HPC job manager Slurm and the software container system Apptainer. Users familiar with Nextflow may alternatively reconfigure the nextflow.config file to use another job manager and another Docker-compatible container system, but regrettably we are unable to provide much support for such use cases. Once you have installed Nextflow on an HPC with Slurm and Apptainer, XENO automatically fetches the remaining software requirements. Note that XENO therefore must be run from an environment with internet access.
 
 ### Installing Nextflow with Conda
-You may install Nextflow 25.04.6 any way you prefer to run XENO. If you wish, you can replicate the Conda environment we used to develop XENO with the included [YAML file](https://github.com/EcoEvoGenomics/XENO/blob/main/examples/nextflow-25.04.6.conda.yaml). You may copy that file directly from GitHub or run the following command after [installing XENO](#installing-xeno).
-```sh
-conda create --name nf --file examples/nextflow-25.04.6.conda.yaml 
-```
+You can replicate the Conda environment we used to develop XENO from [here](https://github.com/EcoEvoGenomics/XENO/wiki/Technical-Details#nextflow-environment).
 
 ### Installing XENO
 The intended way to "install" XENO is simply to clone this GitHub repository to a suitable location on your HPC environment:
