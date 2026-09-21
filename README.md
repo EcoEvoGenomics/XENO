@@ -43,7 +43,25 @@ XENO requires three mandatory pieces of reference information. They are:
 
 - A reference genome in uncompressed fasta format (`.fa`, `.fasta`). This must have been separately indexed with `bwa index`, and the index output files (`.amb`, `.ann`, `.bwt`, `.fai`, `.pac`, and `.sa`) must be found at the same path. Please note that the name of every contig (including detached scaffolds) in the reference genome **must** be exclusively alphanumeric. You can easily rename contigs and build the required bwa index with [MORPH](https://github.com/EcoEvoGenomics/MORPH).
 - A prefix (as a text string) to distinguish scaffolds from contigs. Many reference genomes distinguish loosely assembled scaffolds from full contigs (e.g. `chr1`, `chr2`, ...) by prefixing their names with different strings. For instance, NCBI reference genomes may prefix contigs with "NC_" and scaffolds with "NW_". If applicable, you should provide the prefix characteristic of scaffolds (e.g. `NW_`) to enable more efficient distribution of genotyping windows. If not applicable, you may provide an arbitrary string that matches no contig.
-- A ploidy file (see the BCFtools documentation for [--ploidy-file](https://samtools.github.io/bcftools/bcftools.html#ploidy)). This file is required to call sex chromosomes, haploid chromosomes, mtDNA, or other non-diploid chromosomes correctly. By default every contig is considered diploid.
+- A ploidy file. This file is required to call sex chromosomes, haploid chromosomes, mtDNA, or other non-diploid chromosomes correctly.
+
+Read about ploidy files in the BCFtools documentation: [--ploidy-file](https://samtools.github.io/bcftools/bcftools.html#ploidy). For quick reference, the ploidy file must specify the following information: contig name, start position, end position, sex code, and ploidy. An asterisk (`*`) is a wildcard matching any contig, position, or sex code. The sex codes must correspond to those used in your [input CSV file](#how-to-correctly-format-your-input-csv-file). To treat every contig in every sample as diploid:
+```
+* * * F 2
+* * * M 2
+```
+If the sex chromosomes, e.g. `chrZ` and `chrW`, and the mitochondrial contig `mtDNA` should be handled differently (here for a species with ZW sex determination):
+```
+chrZ 1 100000000 F 1
+chrW 1 100000000 F 1
+chrZ 1 100000000 M 2
+chrW 1 100000000 M 0
+mtDNA 1 100000000 F 1
+mtDNA 1 100000000 M 1
+* * * F 2
+* * * M 2
+```
+The end positions here are arbitrary. They must be at least as large as the length of the contig, and the contig names must match those in your reference genome exactly.
 
 ### How to correctly format your input CSV file
 For each sample you wish to genotype, XENO requires five inputs. You must provide the inputs in a comma-separated file (`.csv`) with one row per pair of forward and reverse read files and five columns:
