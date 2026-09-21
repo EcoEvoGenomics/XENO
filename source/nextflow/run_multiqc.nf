@@ -1,8 +1,6 @@
 workflow {
 
-    def config = file("./source/assets/multiqc_config.yaml")
-    def sparrows_logo = file("./source/assets/sparrows.jpg")
-    run_multiqc(params.results_dir, config, sparrows_logo)
+    run_multiqc(params.results_dir)
 
 }
 
@@ -17,8 +15,6 @@ process run_multiqc {
 
     input:
     path(results_dir)
-    path(multiqc_config)
-    path(sparrows_logo)
 
     output:
     path('multiqc_report.html')
@@ -26,7 +22,7 @@ process run_multiqc {
     script:
     """
     multiqc \
-    --config ${multiqc_config} \
+    --config ${projectDir}/source/config/multiqc.yaml \
     --force \
     ${results_dir}
     mv *multiqc_report.html multiqc_report.html

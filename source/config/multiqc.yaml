@@ -1,26 +1,8 @@
-title: "genotyping_pipeline"
-subtitle: "Sparrow Genotyping Pipeline"
-intro_text: "UiO Ecological and Evolutionary Genomics Group"
+title: "XENO"
+subtitle: "Expedient Genotyping for Nonmodel Organisms"
+intro_text: "Brought to you by the UiO Ecological and Evolutionary Genomics Group. Please visit our GitHub at https://github.com/EcoEvoGenomics"
 show_analysis_time: true
 show_analysis_paths: false
-
-custom_logo: "sparrows.jpg"
-custom_logo_url: "https://github.com/EcoEvoGenomics"
-custom_logo_title: "Visit our GitHub: https://github.com/EcoEvoGenomics"
-
-highlight_patterns:
-  - "PBAC"
-  - "PDOM"
-  - "PHIS"
-  - "PITA"
-  - "PMON"
-
-highlight_colors:
-  - "#000080"
-  - "#1E90FF"
-  - "#8B0000"
-  - "#FFD700"
-  - "#008B00"
 
 table_columns_visible:
   fastqc_trimmed_reads-median_sequence_length: false
