@@ -94,7 +94,7 @@ process {
   withLabel: "high_mem_per_cpu" {
     queue = "bigmem"
   }
-  
+
 }
 ```
 Consult the documentation for the HPC you use to select an appropriate queue for each of these labels. This is *especially* salient for the `high_mem_per_cpu` label. The cost of jobs with a high memory allocation could increase drastically on a queue with limited memory - at no benefit to you (or other users of the same HPC). While to some extent we have optimised XENO's resource consumption, XENO does not (and cannot) estimate the monetary cost of a job: your use of paid (and indeed, shared) resources is your own responsibility. After configuring Nextflow appropriately, you may optionally modify settings such as the maximum number of concurrent tasks. See the [Nextflow documentation](https://docs.seqera.io/nextflow/config) for options.
@@ -133,62 +133,38 @@ The file path passed to `trimming_flags` is to a plain .txt file with one fastp 
 --cut_tail
 ```
 
-#### Launching XENO through the job scheduler
-Experienced UNIX / HPC users will require no assistance launching XENO: simply load the required dependencies and call `bash ./XENO` in the way you see fit. This section and the next will cover two such ways for less experienced bioinformaticians.
-
-A simple way to run XENO is to write a Slurm job script to load dependencies and launch XENO. For example:
-```sh
-#!/bin/bash
-
-#SBATCH --job-name=XENO
-#SBATCH --output=SLURM-%j-%x.out
-#SBATCH --error=SLURM-%j-%x.err
-#SBATCH --nodes=1
-#SBATCH --tasks=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=5G
-#SBATCH --time=99:00:00
-
-module --quiet purge
-module load Miniconda3/22.11.1-1
-conda activate Nextflow25.04.6
-bash ./XENO
-```
-Note that this is a generalised example, *not* a working script. You must consult your HPC documentation to adapt this script to the specifications of your HPC environment. When you have prepared your Slurm script, simply delegate it to a compute node with:
-```sh
-sbatch your_launch_script.sh
-```
-You may then monitor XENO's progress by perusing the slurm logs, and by inspecting the Slurm queue with `squeue --me`. Note that launching XENO through `sbatch` means launching Nextflow on a compute node: this may lead to unexpected problems. If you experience errors while launching XENO through the job scheduler, read on below.
-
 #### Launching XENO on a screen terminal
-The most robust way to launch XENO is directly from the terminal. However, XENO should not usually be launched from a regular terminal window, because processes in a regular terminal window are interrupted when you exit. Instead you can open a screen terminal, which persists indefinitely in the background. If you are unfamiliar, the following is a brief introduction. You open a screen terminal with:
-```sh
-screen
-```
-You may exit the screen terminal by simultaneously holding the keys Ctrl + A, then the key D on your keyboard. Then, to resume the screen session, use:
-```sh
-screen -r
-```
-If you have multiple screen sessions running, you can use the following command to list the active screen terminals:
-```sh
-screen -list
-```
-Then you may use the following to resume a specific screen session:
-```sh
-screen -r session-id-here
-```
-You must load the necessary prerequesite software on the screen terminal before launching XENO. Like [above](#launching-xeno-through-the-job-scheduler), the exact steps required will depend on your HPC, but this should look something like the following. Please note that these commands will not (necessarily) work - they are for illustration. Consult your HPC documentation to get information about available modules and how to activate Conda.
+The most robust way to launch XENO is directly from the terminal. First load the required dependencies: the exact commands depend on your HPC, so consult your HPC documentation to get information about available modules and how to activate Conda. Usually this should look similar to:
 ```sh
 module load conda
 conda activate Nextflow-25.04.6
 bash ./XENO
 ```
-Alternatively, you may [prepare a script with the necessary commands](#launching-xeno-through-the-job-scheduler) and run it directly from the screen terminal (you may omit Slurm headers as they are ignored here):
+Then navigate to the XENO repository and call:
+```sh
+bash ./XENO
+```
+However, XENO should not usually be launched from a regular terminal window, because processes in a regular terminal window are interrupted when you exit. We recommend you use a screen terminal. If you are unfamiliar, the following is a brief introduction. Screen terminals, unlike regular terminal sessions, persist indefinitely in the background after you open them. You open a screen terminal with:
+```sh
+screen
+```
+You may "detach" (close without terminating) the screen terminal by simultaneously holding the keys Ctrl + A, then the key D on your keyboard. Then, to resume the screen session, use:
+```sh
+screen -r
+```
+If you have multiple active screen terminals, you can use the following command to list them:
+```sh
+screen -list
+```
+Then, to resume a specific screen:
+```sh
+screen -r session-id-here
+```
+Alternatively, you may prepare a script with the necessary commands and run it directly from the screen terminal:
 ```sh
 bash your_launch_script.sh
 ```
-Either way, on the screen terminal you can monitor Nextflow in real-time as it launches compute jobs. The individual compute jobs are visible through `squeue --me` as usual. The queue is accessible from any terminal. No heavy computation is performed on the screen terminal, which primarily handles software downloads and monitors the compute jobs.
+Either way, on the screen terminal you can monitor Nextflow in real-time as it launches compute jobs. The individual Slurm tasks are visible through `squeue --me`. The queue is accessible from any terminal. No heavy computation is performed on the screen terminal, which primarily handles software downloads and monitors the compute jobs.
 
 #### Resuming XENO
 It is not entirely unusual for HPC jobs to stop prematurely - perhaps because your compute allocation was depleted, because you accidentally cancelled a job, or for altogether enigmatic and irreproducible reasons. Thankfully, Nextflow caches progress (in a subdirectory called `/work`) so that XENO can resume in the event of an untimely stop. Simply ensure all XENO jobs were cancelled, then relaunch. Of course, XENO most often stops in the event of (user) error. XENO is most prone to errors caused by faulty read files for individual samples. If this befalls you, you may simply remove the offending sample from the input CSV and relaunch XENO. We are unable to troubleshoot read files for you, but if XENO persistently exits with an error for another reason, feel free to post a GitHub Issue. Please describe the error in sufficient detail to reproduce it.
