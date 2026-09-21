@@ -22,6 +22,16 @@ thisLauncherPath=$(readlink -f "$0")
 repoPath=$(dirname "$thisLauncherPath")
 cd $repoPath
 
+doTrimAlign=false
+if grep -q "trim_align: true" ./options.yaml; then
+    doTrimAlign=true
+fi
+
+doCallVariants=false
+if grep -q "call_variants: true" ./options.yaml; then
+    doCallVariants=true
+fi
+
 publishDir=${repoPath}/output
 alignmentsDir=${publishDir}/alignments
 variantsDir=${publishDir}/variants
@@ -32,7 +42,7 @@ nextflow -log ./.nextflow/nextflow.log \
     -resume \
     -params-file ./options.yaml
 
-if grep -q "trim_align: true" ./options.yaml; then
+if [ "$doTrimAlign" = true ]; then
     mkmissingdir $alignmentsDir
     nextflow -log ./.nextflow/nextflow.log \
         run ./source/nextflow/trim_align_reads.nf \
@@ -42,7 +52,7 @@ if grep -q "trim_align: true" ./options.yaml; then
         --publish_dir $alignmentsDir
 fi
 
-if grep -q "call_variants: true" ./options.yaml; then
+if [ "$doCallVariants" = true ]; then
     chkprevious "Step: call_variants" $alignmentsDir
     mkmissingdir $variantsDir
     nextflow -log ./.nextflow/nextflow.log \
