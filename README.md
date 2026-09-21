@@ -1,7 +1,7 @@
 # XENO: Expedient Genotyping for Nonmodel Organisms
 
 ## What is XENO?
-XENO is a beginner-friendly genotyping pipeline built for evolutionary and ecological genomics. With XENO, you can (1) trim reads and align them to a reference genome, (2) call variants, (3) filter those variants, and finally (4) phase the variants. These four stages of XENO may be performed separately in stepwise order or end-to-end. At each stage, XENO outputs alignments, variant call files, and / or quality control statistics. These outputs may be passed directly to workflows from XENO's companion repository [RIPLEY](https://github.com/EcoEvoGenomics/RIPLEY), which automate many of the most common analyses in evolutionary and ecological genomics.
+XENO is a beginner-friendly genotyping pipeline built for evolutionary and ecological genomics. With XENO, you can (1) trim reads and align them to a reference genome and (2) call variants against that same reference. These two stages of XENO may be performed separately in stepwise order or end-to-end. XENO outputs trimmed read files, alignments, and variant call files plus quality control statistics. The outputs are designed to be passed directly to analysis workflows in XENO's companion repository [RIPLEY](https://github.com/EcoEvoGenomics/RIPLEY). RIPLEY handles variant filtering and common population genomic analyses.
 
 The Wiki describes XENO in greater detail. There you will also find guides for some specific use-cases or users.
 
@@ -39,12 +39,11 @@ git clone -b dev https://github.com/EcoEvoGenomics/XENO
 4. Adjust options as necessary and finally launch XENO (see [here](#how-to-launch-xeno)).
 
 ### Required reference files
-XENO requires three mandatory and one optional piece of reference information. They are:
+XENO requires three mandatory pieces of reference information. They are:
 
 - A reference genome in uncompressed fasta format (`.fa`, `.fasta`). This must have been separately indexed with `bwa index`, and the index output files (`.amb`, `.ann`, `.bwt`, `.fai`, `.pac`, and `.sa`) must be found at the same path. Please note that the name of every contig (including detached scaffolds) in the reference genome **must** be exclusively alphanumeric. You can easily rename contigs and build the required bwa index with [MORPH](https://github.com/EcoEvoGenomics/MORPH).
 - A prefix (as a text string) to distinguish scaffolds from contigs. Many reference genomes distinguish loosely assembled scaffolds from full contigs (e.g. `chr1`, `chr2`, ...) by prefixing their names with different strings. For instance, NCBI reference genomes may prefix contigs with "NC_" and scaffolds with "NW_". If applicable, you should provide the prefix characteristic of scaffolds (e.g. `NW_`) to enable more efficient distribution of genotyping windows. If not applicable, you may provide an arbitrary string that matches no contig.
 - A ploidy file (see the BCFtools documentation for [--ploidy-file](https://samtools.github.io/bcftools/bcftools.html#ploidy)). This file is required to call sex chromosomes, haploid chromosomes, mtDNA, or other non-diploid chromosomes correctly. By default every contig is considered diploid.
-- **Optional:** For variant phasing, you *may* provide XENO the absolute path to a directory containing recombination rate maps. The recombination maps must be compatible with [SHAPEIT5](https://odelaneau.github.io/shapeit/). The directory should contain one recombination map file for each contig in the reference genome and they must be named on the format "contig.map". If for instance your reference genome has the contigs "chr1" and "chr2", the recombination map directory must contain two files: "chr1.map" and "chr2.map". If you do not have recombination maps, you may set this variable to an arbitrary path: XENO will statistically phase the variants instead of using maps.
 
 ### How to correctly format your input CSV file
 For each sample you wish to genotype, XENO requires five inputs. You must provide the inputs in a comma-separated file (`.csv`) with one row per pair of forward and reverse read files and five columns:
@@ -86,15 +85,13 @@ process {
 Consult the documentation for the HPC you use to select an appropriate queue for each of these labels. This is *especially* salient for the `high_mem_per_cpu` label. The cost of jobs with a high memory allocation could increase drastically on a queue with limited memory - at no benefit to you (or other users of the same HPC). While to some extent we have optimised XENO's resource consumption, XENO does not (and cannot) estimate the monetary cost of a job: your use of paid (and indeed, shared) resources is your own responsibility. After configuring Nextflow appropriately, you may optionally modify settings such as the maximum number of concurrent tasks. See the [Nextflow documentation](https://docs.seqera.io/nextflow/config) for options.
 
 #### Setting XENO options
-XENO has user-configurable options. For instance you may change the alignment method or variant filters you apply. These options are read from `options.yaml`, which you must configure before launching XENO. The available options are:
+XENO has user-configurable options. These options are read from `options.yaml`, which you must configure before launching XENO. The available options are:
 
 | Option | Description | Example | Default |
 |--------|-------------|---------|---------|
 | `samples` | Path to sample CSV file. | `/user/path/samples.csv` | |
 | `trim_align` | Run trimming and alignment stage? | `true` | `true` |
 | `call_variants` | Run variant calling stage? | `true` | `true` |
-| `filter_variants` | Run variant filtering stage? | `true` | `true` |
-| `phase_variants` | Run variant phasing stage? | `true` | `true` |
 | `deduplicate` | Deduplicate reads before trimming? | `false` | `false` |
 | `downsample` | Downsample R1 and R2 files to `read_target` before trimming? | `false` | `false` |
 | `read_target` | Number of reads to downsample to in each of R1 and R2 files.  | `250000` | `1000000` |
@@ -102,11 +99,7 @@ XENO has user-configurable options. For instance you may change the alignment me
 | `aligner` | Align with `gpu` ([fq2bam](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/fq2bam)), `mem` (bwa mem), or `aln` (bwa aln)? While `gpu` is most efficient, you need [compatible GPUs](https://docs.nvidia.com/clara/parabricks/get-started/installation-requirements#hardware-requirements) to use it.  | `mem` | `gpu` |
 | `exclude_flags` | Exclude reads with this/these flag(s) from alignments. See options [here](https://www.htslib.org/doc/samtools-flags.html). | `DUP,UNMAP` | `0x400` |
 | `concatenate_raw_vcf` | If `false`, only output variants in per-chromosome files. If `true`, also create whole-genome VCF of raw variants. | `true` | `false` |
-| `filtering_label` | A label for the filters in `filtering_flags`. Change between runs to re-filter with different settings. | `biallelic_variants` | `default_filters` |
-| `filtering_flags` | Path to a file with [VCFtools filtering flags](https://vcftools.github.io/man_latest.html#SITE%20FILTERING%20OPTIONS). Regardless, XENO only retains SNPs - not indels. | `/user/path/filters_biallelic_variants.txt` | `./example/default.filt` |
-| `phasing_window_size` | Size of phasing windows. Lower sizes yield greater parallelisation.  | `20000000` | `10000000` |
 | `ref_genome` | Path to [reference genome](#required-reference-files). | `/user/path/ref/reference_genome.fa` | |
-| `ref_recombination_map_dir` | Path to directory of [recombination maps](#required-reference-files). | `/user/path/ref/recombination_maps/` | |
 | `ref_scaffold_name` | [Prefix](#required-reference-files) characteristic of scaffolds in reference genome. | `NW_` | |
 | `ref_ploidy_file` | Path to [ploidy file](#required-reference-files). | `/user/path/ref/reference.ploidy` | `./examples/default.ploidy` |
 
@@ -180,8 +173,6 @@ Thank you for using XENO. If you wish to cite XENO, you should first cite the th
 - Alignment ("gpu" option): [Parabricks v. 4.5.0-1](https://doi.org/10.1101/2025.07.23.666378); [SAMtools v. 1.17](https://doi.org/10.1093/gigascience/giab008)
 - Alignment ("[mem](https://doi.org/10.48550/arXiv.1303.3997)" and "[aln](https://pubmed.ncbi.nlm.nih.gov/19451168/)" option): [bwa v. 0.7.17](https://doi.org/10.48550/arXiv.1303.3997); [SAMtools v. 1.17](https://doi.org/10.1093/gigascience/giab008); [GATK4 v. 4.6.2.0](https://www.oreilly.com/library/view/genomics-in-the/9781491975183/)
 - Variant calling: [BEDtools 2.30.0](https://doi.org/10.1093/bioinformatics/btq033); [BCFtools 1.17](https://doi.org/10.1093/gigascience/giab008)
-- Variant filtering: [VCFtools 0.1.16](https://doi.org/10.1093/bioinformatics/btr330); [BCFtools 1.17](https://doi.org/10.1093/gigascience/giab008)
-- Variant phasing: [BEDtools 2.30.0](https://doi.org/10.1093/bioinformatics/btq033); [SHAPEIT5 v. 5.1.1](https://doi.org/10.1038/s41588-023-01415-w); [BCFtools 1.17](https://doi.org/10.1093/gigascience/giab008)
 - Quality control report: [MultiQC v. 1.28](http://dx.doi.org/10.1093/bioinformatics/btw354)
 
 ### Citing XENO

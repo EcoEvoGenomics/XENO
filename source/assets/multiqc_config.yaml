@@ -175,13 +175,6 @@ software_versions:
   "Variant calling":
     bedtools: "2.30.0"
     bcftools: "1.17"
-  "Variant filtering":
-    vcftools: "0.1.16"
-    bcftools: "1.17"
-  "Variant phasing":
-    SHAPEIT5: "5.1.1"
-    bedtools: "2.30.0"
-    bcftools: "1.17"
   "MultiQC report":
     multiqc: "1.28"
 

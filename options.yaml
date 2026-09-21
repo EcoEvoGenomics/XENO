@@ -4,8 +4,6 @@ samples:
 # Which steps to run?
 trim_align: true
 call_variants: true
-filter_variants: true
-phase_variants: true
 
 # Options for read pre-processing and alignment
 deduplicate: false
@@ -18,15 +16,7 @@ exclude_flags: 0x400
 # Options for variant calling
 concatenate_raw_vcf: false
 
-# Options for variant filtering
-filtering_label: default
-filtering_flags: ./examples/default.filt
-
-# Options for phasing
-phasing_window_size: 10000000
-
 # Reference genome
 ref_genome: 
-ref_recombination_map_dir: 
 ref_scaffold_name: 
 ref_ploidy_file: ./examples/default.ploidy
