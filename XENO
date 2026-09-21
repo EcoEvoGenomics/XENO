@@ -18,14 +18,14 @@ chkprevious() {
     fi
 }
 
-this_script_path=$(readlink -f "$0")
-repository_path=$(dirname "$this_script_path")
-cd $repository_path
+thisLauncherPath=$(readlink -f "$0")
+repoPath=$(dirname "$thisLauncherPath")
+cd $repoPath
 
-output_dir=${repository_path}/output
-trim_align_output_dir=${output_dir}/alignments
-call_variants_output_dir=${output_dir}/variants
-mkmissingdir $output_dir
+publishDir=${repoPath}/output
+alignmentsDir=${publishDir}/alignments
+variantsDir=${publishDir}/variants
+mkmissingdir $publishDir
 
 nextflow -log ./.nextflow/nextflow.log \
     run ./source/nextflow/check_inputs.nf \
@@ -33,28 +33,28 @@ nextflow -log ./.nextflow/nextflow.log \
     -params-file ./options.yaml
 
 if grep -q "trim_align: true" ./options.yaml; then
-    mkmissingdir $trim_align_output_dir
+    mkmissingdir $alignmentsDir
     nextflow -log ./.nextflow/nextflow.log \
         run ./source/nextflow/trim_align_reads.nf \
-        -with-report $trim_align_output_dir/workflow_report.html \
+        -with-report $alignmentsDir/workflow_report.html \
         -resume \
         -params-file ./options.yaml \
-        --publish_dir $trim_align_output_dir
+        --publish_dir $alignmentsDir
 fi
 
 if grep -q "call_variants: true" ./options.yaml; then
-    chkprevious "Step: call_variants" $trim_align_output_dir
-    mkmissingdir $call_variants_output_dir
+    chkprevious "Step: call_variants" $alignmentsDir
+    mkmissingdir $variantsDir
     nextflow -log ./.nextflow/nextflow.log \
         run ./source/nextflow/call_variants.nf \
-        -with-report $call_variants_output_dir/workflow_report.html \
+        -with-report $variantsDir/workflow_report.html \
         -resume \
         -params-file ./options.yaml \
-        --cram_dir $trim_align_output_dir \
-        --publish_dir $call_variants_output_dir
+        --cram_dir $alignmentsDir \
+        --publish_dir $variantsDir
 fi
 
 nextflow -log ./.nextflow/nextflow.log \
     run ./source/nextflow/run_multiqc.nf \
-    --results_dir $output_dir \
-    --publish_dir $output_dir
+    --results_dir $publishDir \
+    --publish_dir $publishDir
