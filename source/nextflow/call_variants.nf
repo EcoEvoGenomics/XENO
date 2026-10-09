@@ -154,7 +154,7 @@ process genotype_window {
 
     container "quay.io/biocontainers/bcftools:1.17--h3cc50cf_1"
     cpus { 1 }
-    memory { 4.GB * task.attempt }
+    memory { 6.GB * task.attempt }
     time { 8.h * task.attempt }
 
     errorStrategy "retry"
