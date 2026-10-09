@@ -207,13 +207,13 @@ process genotype_window {
     while read -r cram_path; do
         cram_basename="\${cram_path##*/}"
         sample_id="\${cram_basename%.cram}"
-        sample_sex=\$(grep -w \$sample_id ${samples_csv} | awk -F, '{print \$2}')
-        echo -e "\${cram_path}\\t\${sample_sex}" >> sample_sexes.ped
+        sample_sex=\$(grep -w \$sample_id ${samples_csv} | head -n1 | awk -F, '{print \$2}')
+        echo -e "\${cram_path}\\t\${sample_sex}" >> samples.tsv
     done < "pileup_crams.txt"
 
     bcftools call \
     --threads ${task.cpus} \
-    --samples-file sample_sexes.ped \
+    --samples-file samples.tsv \
     --ploidy-file ${ploidy_file} \
     --output ${window}.vcf.gz \
     -f GQ,GP -mO z \
